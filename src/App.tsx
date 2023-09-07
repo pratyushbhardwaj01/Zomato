@@ -9,7 +9,7 @@ function App() {
       </section>
       <section
         id="detail"
-        className="grow lg:flex-row lg:items-center lg:justify-center h-[calc(100vh-140px)] overflow-scroll p-[10px]"
+        className="grow flex flex-col justify-center items-stretch lg:items-center lg:justify-center h-[calc(100vh-140px)] overflow-scroll p-[10px]"
       >
         <Outlet />
       </section>

@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
-import ShowRocket from "../../components/ShowRocket";
+import ShowRocket from "../../components/Rocket";
 import Vehicle from "../../components/Planet";
 import {
   fetchPlanets,
@@ -18,13 +18,18 @@ import {
 } from "./types";
 import { updateStatePlanet, updateStateVehicle } from "../../utils/stateUtils";
 import VehicleOptions from "../../components/VehicleOptions";
+import Planet from "../../components/Planet";
+import Rocket from "../../components/Rocket";
+import PlanetOptions from "../../components/PlanetOptions";
+
+const stateDefaultValue = Array(4).fill({});
 
 const Home = () => {
   const [planets, setPlanets] = useState<PlanetInfoType[]>([]);
   const [vehicles, setVehicles] = useState<VehiclesInfoType[]>([]);
   const [modal, setModal] = useState<"planet" | "vehicle" | null>(null);
-  const [state, setState] = useState<SelectedDataType[]>(() =>
-    Array(4).fill({})
+  const [state, setState] = useState<SelectedDataType[]>(
+    () => stateDefaultValue
   );
   const currentSelectedBox = useRef<null | number>(null);
   const navigate = useNavigate();
@@ -85,30 +90,6 @@ const Home = () => {
       });
     }, [vehicles, state]);
 
-  const getAvailablePlanets = availablePlanets.map((planetInfo) => {
-    return (
-      <div
-        key={planetInfo.name}
-        className=" flex flex-col justify-around text-center p-4 w-[120px] cursor-pointer "
-        onClick={() => updatePlanet(planetInfo)}
-      >
-        <p
-          className={`text-xl font-semibold text-white ${
-            planetInfo.selected ? "opacity-25" : ""
-          }`}
-        >
-          {planetInfo.name}
-        </p>
-        <img
-          src={planetInfo.img}
-          className={`object-contain ${
-            planetInfo.selected ? "opacity-25" : ""
-          }`}
-        />
-      </div>
-    );
-  });
-
   const openModal = (modal: "planet" | "vehicle", idx: number) => () => {
     setModal(modal);
     currentSelectedBox.current = idx;
@@ -116,7 +97,7 @@ const Home = () => {
 
   function updatePlanet(currentPlanetInfo: AvailablePlanetInfoType) {
     const boxNo = currentSelectedBox.current;
-    if (boxNo === null) {
+    if (boxNo === null || currentPlanetInfo.selected) {
       return;
     }
     setState(updateStatePlanet(state, boxNo, currentPlanetInfo));
@@ -125,7 +106,7 @@ const Home = () => {
 
   function updateVehicle(vehicleInfo: AvailableVehicleInfoType) {
     const boxNo = currentSelectedBox.current;
-    if (boxNo === null) {
+    if (boxNo === null || !vehicleInfo.available) {
       return;
     }
 
@@ -147,31 +128,39 @@ const Home = () => {
     return item.planet && item.vehicle;
   });
 
+  function handleReset() {
+    setModal(null);
+    setState(stateDefaultValue);
+  }
+
   return (
-    <div className="   flex flex-col items-center h-[calc(100vh-240px)] justify-center gap-[40px] ">
+    <div className="flex flex-col items-center justify-center gap-[40px] w-full">
       <p className="text-white text-lg lg:text-2xl text-center">
         Time Taken: {timeTaken}
       </p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8   overflow-scroll p-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 p-2 w-full max-w-7xl">
         {state.map(({ planet, vehicle }, index) => {
           return (
             <div key={index} className="">
-              <div className="bg-gray-600 p-3 md:p-10 flex flex-col gap-2 md:gap-10 rounded-lg ">
-                <Vehicle
+              <div className="bg-gray-600 p-4 md:p-6 flex flex-col gap-4 md:gap-10 rounded-lg">
+                <Planet
                   onClick={openModal("planet", index)}
                   image={planet?.img}
+                  name={planet?.name || ""}
                 />
                 {planet && (
-                  <ShowRocket
+                  <Rocket
                     onClick={openModal("vehicle", index)}
                     image={vehicle?.img}
                     isSelected={!!vehicle}
                   />
                 )}
               </div>
-              <p className="lg:text-2xl text-center mt-2 bg-gray-200 rounded-sm text-black">
-                Option {index + 1}
-              </p>
+              <div className="flex justify-center">
+                <p className="lg:text-xl text-center mt-2 bg-gray-200 rounded-sm text-black w-fit px-2 text-sm">
+                  Option {index + 1}
+                </p>
+              </div>
             </div>
           );
         })}
@@ -180,7 +169,7 @@ const Home = () => {
       {modal !== null && (
         <Modal onClose={() => setModal(null)}>
           {modal === "planet" ? (
-            getAvailablePlanets
+            <PlanetOptions options={availablePlanets} onSelect={updatePlanet} />
           ) : (
             <VehicleOptions
               options={availableVchiles}
@@ -189,17 +178,23 @@ const Home = () => {
           )}
         </Modal>
       )}
+      <div className="flex items-center gap-4 md:min-w-[400px]">
+        <button
+          onClick={handleReset}
+          className="flex justify-center flex-1 bg-transparent hover:bg-blue-500  font-semibold text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+        >
+          Reset
+        </button>
 
-      {showBtn && (
-        <div className="w-full flex justify-center">
+        {showBtn && (
           <button
             onClick={findFalcone}
-            className="flex justify-center w-[250px]  bg-transparent hover:bg-blue-500  font-semibold text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+            className="flex justify-center flex-1 whitespace-nowrap bg-transparent hover:bg-blue-500  font-semibold text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
           >
             Find Falcone
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
