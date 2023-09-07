@@ -2,8 +2,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "../../components/Modal";
 import { useNavigate } from "react-router-dom";
-import ShowRocket from "../../components/Rocket";
-import Vehicle from "../../components/Planet";
 import {
   fetchPlanets,
   findFalcone as findFalconeAPI,
