@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 
 const ResponseText = {
-  success: "Success",
+  success: "success",
   failure: "false",
 };
 
@@ -20,9 +20,9 @@ export const Result = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="h-[calc(100vh-140px)] flex flex-col items-center justify-center gap-[20px]">
+    <div className="h-[calc(100vh-240px)] flex flex-col items-center justify-center gap-[30px]">
       {isSuccess ? (
-        <div>
+        <div className="flex flex-col gap-[30px]">
           <div className="text-white text-5xl text-center">
             {Texts.successMsg}
           </div>

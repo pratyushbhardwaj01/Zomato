@@ -19,7 +19,7 @@ import {
 import { updateStatePlanet, updateStateVehicle } from "../../utils/stateUtils";
 import VehicleOptions from "../../components/VehicleOptions";
 
-const Content = () => {
+const Home = () => {
   const [planets, setPlanets] = useState<PlanetInfoType[]>([]);
   const [vehicles, setVehicles] = useState<VehiclesInfoType[]>([]);
   const [modal, setModal] = useState<"planet" | "vehicle" | null>(null);
@@ -56,6 +56,11 @@ const Content = () => {
 
   const availableVchiles: AvailableVehicleInfoType[] | undefined =
     useMemo(() => {
+      const index = currentSelectedBox.current;
+      if (index === null) {
+        return [];
+      }
+      console.log(index, "index");
       return vehicles.map((vehicle) => {
         let cnt = 0;
         state.forEach((s) => {
@@ -64,8 +69,15 @@ const Content = () => {
           }
         });
 
-        const isAvailable = cnt < vehicle.totalNo;
+        let isRechable = false;
 
+        const distance = state[index].planet?.distance;
+
+        if (state[index].planet && distance) {
+          isRechable = !!(vehicle.maxDistance >= distance);
+        }
+
+        const isAvailable = cnt < vehicle.totalNo && isRechable;
         return {
           ...vehicle,
           available: isAvailable,
@@ -136,11 +148,11 @@ const Content = () => {
   });
 
   return (
-    <div className="  flex flex-col ">
+    <div className="   flex flex-col items-center h-[calc(100vh-240px)] justify-center gap-[40px] ">
       <p className="text-white text-lg lg:text-2xl text-center">
         Time Taken: {timeTaken}
       </p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 overflow-scroll p-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8   overflow-scroll p-2">
         {state.map(({ planet, vehicle }, index) => {
           return (
             <div key={index} className="">
@@ -157,7 +169,7 @@ const Content = () => {
                   />
                 )}
               </div>
-              <p className="lg:text-2xl text-center mt-2 bg-gray-200  rounded-sm text-black">
+              <p className="lg:text-2xl text-center mt-2 bg-gray-200 rounded-sm text-black">
                 Option {index + 1}
               </p>
             </div>
@@ -192,4 +204,4 @@ const Content = () => {
   );
 };
 
-export default Content;
+export default Home;

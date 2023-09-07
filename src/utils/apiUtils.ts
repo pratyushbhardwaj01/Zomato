@@ -89,4 +89,10 @@ async function findFalcone(
   };
 }
 
-export { fetchPlanets, fetchVehicles, findFalcone };
+export {
+  fetchPlanets,
+  fetchVehicles,
+  findFalcone,
+  planetImages,
+  vehicleImages,
+};
